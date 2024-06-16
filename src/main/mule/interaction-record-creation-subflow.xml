@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="interaction-record-creation-Sub_Flow" doc:id="70be0216-1955-4827-8175-db28692baba8" >
+		<logger level="INFO" doc:name="Incoming request payload from SAP" doc:id="4c73a8d4-7c37-4f39-8b52-00a37ddf0b71" message="Incoming request payload is ::: #[payload]"/>
+		<set-variable value='#[%dw 2.0&#10;output application/json skipNullOn = "everywhere"&#10;---&#10;"Interaction_Record_Creation_Subflow"]' doc:name="upstreamServiceName" doc:id="0ec153f8-5b65-4d05-aa67-9232745bfbe5" variableName="upstreamServiceName"/>
+		<ee:transform doc:name="extracting-notes" doc:id="0d45d5a8-1701-45b7-a631-66716e20ac95" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+var replaceNextLine = ((payload.T_NOTE[0].note replace "\n" with "nextline")) // replace \n & \n\n with nextline
+---
+payload mapObject ((value, key, index) ->{
+    (key) : if(key contains "T_NOTE") (replaceNextLine splitBy  "nextline" map ((note, index) -> {
+    note : note
+})) else value
+})]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="SF to SAP Payload" doc:id="1e4c1d66-4ba5-47ff-80ef-5ab455ef3eb2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+import * from dw::core::Strings
+import p from Mule
+output application/json
+---
+{
+	(I_CASENUMBER: payload.caseNumber) if (payload.caseNumber != ""),
+	(I_SUBJECT: payload.subject) if (payload.subject != ""),
+	(I_DESCRIPTION: payload.description) if (payload.description != ""),
+	T_NOTE:
+		payload.T_NOTE map {
+			(TDLINE: $.note) if ($.note != null)
+		},
+	I_TRANSACTION_TYPE: p('transaction.type'),
+	I_POSTING_DATE: now() as String {format: "MM/dd/YYYY"},
+	I_ACTIVITY_CATEGORY: p('activity.category'),
+	I_PRIORITY: p('priority'),
+	(I_PARTNER:payload.primaryBpNumber) if(payload.primaryBpNumber != ""),
+	I_START_DATE: now() as String {format: "MM/dd/YYYY"},
+	I_END_DATE: p('end.date')
+}]]></ee:set-payload>
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="upstreamServiceName" ><![CDATA[%dw 2.0
+import p from Mule
+output application/json skipNullOn = "everywhere"
+---
+"Move-Out_Flow_Started"]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="outbound-start-log-subflow" doc:id="9773b7f9-ea55-4855-b991-c5ea63e65717" name="outbound-start-log-subflow" />
+		<logger level="INFO" doc:name="request-payload-to-sap" doc:id="dcbd1bcd-ca3f-4c1d-9b72-063334319090" message='SAP DR6 Interaction Record Creation request payload is ::: #[payload]' />
+		<until-successful maxRetries="3" doc:name="Until Successful" doc:id="650f4f1a-3f81-4526-bb24-1f3e6d40cfd6" >
+			<try doc:name="Try" doc:id="14263d7a-103b-451c-98e0-75019abcb278">
+			<http:request method="POST" doc:name="Request SAP BR6 INTERACTION RECORD CREATION" doc:id="6928ce4e-0551-41b8-8a23-b7103cebe7be" config-ref="HTTPS_Request_configuration" path="bapi/interaction/record" responseTimeout="9999999" sendCorrelationId="AUTO">
+			<http:headers><![CDATA[#[output application/java
+---
+{
+	"client_secret" : p('sap.sys.client_secret'),
+	"client_id" : p('sap.sys.client_id')
+}]]]></http:headers>
+		</http:request>
+				<error-handler ref="outbound-global-exception-strategy" />
+		</try>
+		</until-successful>
+		<choice doc:name="Choice" doc:id="1dcbc382-a343-425e-b130-3c68ee22f31d">
+			<when expression='#[((vars.errorObject == null) or (vars.errorObject == "")) and (isEmpty(payload.errorCode))]'>
+				<ee:transform doc:name="Transform Message" doc:id="d50b194a-a780-462e-b2b8-54937d8b5b9d">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="INFO" doc:name="Output-payload-logger" doc:id="dd298e7a-2ac0-4f30-a658-585b1569275a" message="SAP DR6 Interaction Record Creation Response payload is ::: #[payload]"/>
+			</when>
+			<otherwise>
+				<ee:transform doc:name="Transform Message1" doc:id="a60442da-5840-45a9-b30a-16d2f252e299">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Status" : "Fail",
+	 "errors": [        
+{
+    "type": "E",
+    "errorNumber": vars.errorObject.errorMessage.payload.errorType match {
+    case str if str == "CONNECTIVITY" -> "999"
+    case str if str == "EXPRESSION" -> "998"
+    case str if str == "SYSTEM_BUSY" -> "997"
+    case str if str == "INVALID_CACHE" -> "996"
+    case str if str == "INVALID_INPUT" -> "995"
+    case str if str == "METADATA_UNAVAILABLE" -> "994"
+    case str if str == "NOT_FOUND" -> "993"
+    case str if str == "NOT_SUPPORTED" -> "992"
+    case str if str == "PARSING" -> "991"
+    case str if str == "RETRY_EXHAUSTED" -> "990"
+    case str if str == "TIMEOUT" -> "989"
+    case str if str == "STREAM_MAXIMUM_SIZE_EXCEEDED" -> "988"
+    else -> "987"
+},
+  "message": vars.errorObject.errorMessage.payload.errorType match {
+    case str if str == "CONNECTIVITY" -> "SAP Connectivity Failure or Network is unreachable"
+    case str if str == "EXPRESSION" -> "MuleSoft Dataweave Error"
+    case str if str == "SYSTEM_BUSY" -> "SAP System Busy,Please try after sometime"
+    case str if str == "INVALID_CACHE" -> "SAP Invalid Cache"
+    case str if str == "INVALID_INPUT" -> "SAP Invalid Input,Please check your Input and Retry"
+    case str if str == "METADATA_UNAVAILABLE" -> "SAP Metadata Unavailable"
+    case str if str == "NOT_FOUND" -> "SAP Not Found"
+    case str if str == "NOT_SUPPORTED" -> "SAP Not Supported"
+    case str if str == "PARSING" -> "SAP Parsing Error"
+    case str if str == "RETRY_EXHAUSTED" -> "SAP Retries Exhausted"
+    case str if str == "TIMEOUT" -> "SAP TimeOut error"
+    case str if str == "STREAM_MAXIMUM_SIZE_EXCEEDED" -> "sap stream maximum size exceeded"
+    else -> "SAP Internal Server Error(Default Error)"
+}}]}]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<logger level="ERROR" doc:name="Error Response" doc:id="fa4c184e-3c68-4b5a-b4ff-fbd56c407545" message='SAP DR6 Interaction Record Creation Error Response payload is ::: #[payload]' />
+			</otherwise>
+		</choice>
+		<flow-ref doc:name="outbound-end-log-subflow" doc:id="9c4d3bb8-f275-40aa-8e5e-c34b5af50496" name="outbound-end-log-subflow"/>
+	</sub-flow>
+</mule>

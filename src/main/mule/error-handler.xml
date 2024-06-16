@@ -1,0 +1,473 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<error-handler name="global-exception-strategy" doc:id="244145ba-cc04-4175-9279-640b1d502ff1" >
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="9f74c463-afc7-4ff5-a961-c2cd6bafa42f" type="APIKIT:BAD_REQUEST ">
+			<ee:transform doc:name="set-error-details" doc:id="34823fac-1c33-4255-bba7-e6f2d727b918" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+---
+400]]>
+					</ee:set-variable>
+					<ee:set-variable variableName="errorDetails" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	errorName: "Invalid data provided",
+	errorMessage: "Invalid data provided"
+}]]>
+					</ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="common-error-logic-subflow" doc:id="ecafa50d-0985-456c-82f5-a4318a32edac" name="common-error-logic-subflow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="5ac7db5f-dbca-4018-9735-205757acdccf" type="APIKIT:NOT_FOUND ">
+			<ee:transform doc:name="set-error-details" doc:id="dc68bb8e-3c05-4e18-96b0-248919c9475b" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+---
+404]]>
+					</ee:set-variable>
+					<ee:set-variable variableName="errorDetails" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	errorName: "The server has not found anything matching the request URI",
+	errorMessage: "The server has not found anything matching the request URI"
+}]]>
+					</ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="common-error-logic-subflow" doc:id="7b05bf01-753b-4ba6-9b33-07fa32072926" name="common-error-logic-subflow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2b3fea3f-ddfb-4174-b6e3-54747958519f" type="APIKIT:METHOD_NOT_ALLOWED">
+			<ee:transform doc:name="set-error-details" doc:id="6f73598e-98a0-4d30-a154-750c4acce3ca" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+---
+405]]>
+					</ee:set-variable>
+					<ee:set-variable variableName="errorDetails" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	errorName: "The server has not implemented the requested HTTP method",
+	errorMessage: "The server has not implemented the requested HTTP method"
+}]]>
+					</ee:set-variable>			
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="common-error-logic-subflow" doc:id="22c5e78d-377b-4347-b086-d0f2eabf0b0d" name="common-error-logic-subflow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="4c198a8f-cd07-4c01-9a76-bf98e46a87bc" type="APIKIT:NOT_ACCEPTABLE">
+			<ee:transform doc:name="set-error-details" doc:id="32bad6ff-74a3-4f42-a47a-9600d4aaf62d" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+---
+406]]>
+					</ee:set-variable>
+					<ee:set-variable variableName="errorDetails" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	errorName: "Cannot accept request type",
+	errorMessage: "Cannot accept request type"
+}]]>
+					</ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="common-error-logic-subflow" doc:id="192de13b-709c-4de2-aab5-a8a240f88b13" name="common-error-logic-subflow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="ebbe1b3b-2761-4a27-94e7-3d24b10d2c0a" type="APIKIT:UNSUPPORTED_MEDIA_TYPE">
+			<ee:transform doc:name="set-error-details" doc:id="59ae726d-cb9f-4a57-8483-14498423cb50" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+---
+415]]>
+					</ee:set-variable>
+					<ee:set-variable variableName="errorDetails" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	errorName: "Media type is not supported",
+	errorMessage: "Media type is not supported"
+}]]>
+					</ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="common-error-logic-subflow" doc:id="8c7c9021-1e75-4998-9c1f-d51825983b8d" name="common-error-logic-subflow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="d46a8b1b-71ca-4f5f-a38d-d3cb6c546597" type="MULE:RETRY_EXHAUSTED">
+			<ee:transform doc:name="set-error-details" doc:id="9ce502c1-e1e8-4cd7-b566-eea8c16c078c" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+---
+503]]>
+					</ee:set-variable>
+					<ee:set-variable variableName="errorDetails" ><![CDATA[%dw 2.0
+var errorMessage=" is unavailable and retry attempts are exhausted"
+output application/json
+---
+{
+	errorName: "Service is unavailable and retry attempts are exhausted",
+	errorMessage: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage)
+}]]>
+					</ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="common-error-logic-subflow" doc:id="ef9f9a55-636a-474e-a505-ddac0b4cd4e4" name="common-error-logic-subflow"/>
+		</on-error-propagate>
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="2c7f1baf-821a-485e-ac19-9d93074e41c6" type="MULE:EXPRESSION">
+			<ee:transform doc:name="set-error-details" doc:id="6ab2f805-983c-4116-b83d-33361e2d7305" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="errorDetails" ><![CDATA[%dw 2.0
+output application
+var errorMessage = error.detailedDescription
+---
+{
+	errorName: "There was an error while executing dataweave expression",
+	errorMessage: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage)
+}]]>
+					</ee:set-variable>
+					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+---
+500]]>
+					</ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="common-error-logic-subflow" doc:id="7f7248af-d54a-47dc-b23f-f884774897e6" name="common-error-logic-subflow"/>
+		</on-error-propagate>
+		<!-- [STUDIO:"On Error Propagate"]<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="dc7b3e6a-4401-480d-a5c6-2838600373a9" type="APP:HTTP_REQUEST_ERROR">
+			<choice doc:name="check-http-request-error-type" doc:id="5afb53a7-bd09-41c1-ba5a-616f55806e2e" >
+				<when expression='#[vars.errorObject.errorType.identifier == "BAD_REQUEST"&#93;'>
+					<ee:transform doc:name="set-error-details" doc:id="ac4ee987-3407-40ca-ade0-971b20202feb">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="errorDetails"><![CDATA[%dw 2.0
+var errorMessage=" did not process the request due to incorrect data"
+output application/json
+&#45;&#45;-
+{
+	errorCode: Mule::p('error.code08'),
+	priority: Mule::p('kafka_headers.error_priority_p5'),
+	errorName: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage),
+	errorMessage: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage),
+	(usdErrorDetials: {
+		usdErrorCode: vars.errorObject.errorMessage.payload.errorCode,
+		legacyError: vars.errorObject.errorMessage.payload.legacyError,
+		issues: vars.errorObject.errorMessage.payload.issues
+	}) if(vars.errorObject.errorMessage.payload.errorCode startsWith('UCD'))
+}&#93;&#93;>
+							</ee:set-variable>
+							<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+&#45;&#45;-
+400&#93;&#93;>
+							</ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="common-error-logic-subflow" doc:id="4b2455bf-9880-45cd-b002-83e86098a2e8" name="common-error-logic-subflow" />
+				</when>
+				<when expression='#[vars.errorObject.errorType.identifier == "NOT_FOUND"&#93;'>
+					<ee:transform doc:name="set-error-details" doc:id="ef72eff9-e2a9-4083-b0d3-1eb7274eac87">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="errorDetails"><![CDATA[%dw 2.0
+var errorMessage=" has not found anything matching the request URI"
+output application/json
+&#45;&#45;-
+{
+	errorCode: Mule::p('error.code09'),
+	priority: Mule::p('kafka_headers.error_priority_p5'),
+	errorName: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage),
+	errorMessage: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage)
+}&#93;&#93;>
+							</ee:set-variable>
+							<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+&#45;&#45;-
+404&#93;&#93;>
+							</ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="common-error-logic-subflow" doc:id="473a81a3-65b1-4e46-a98a-a998d3a87c77" name="common-error-logic-subflow" />
+				</when>
+				<when expression='#[vars.errorObject.errorType.identifier == "METHOD_NOT_ALLOWED"&#93;'>
+					<ee:transform doc:name="set-error-details" doc:id="5a7f3dd9-c396-4075-8a5d-a366e97a7c6b">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="errorDetails"><![CDATA[%dw 2.0
+var errorMessage=" has not implemented the requested HTTP method"
+output application/json
+&#45;&#45;-
+{
+	errorCode: Mule::p('error.code10'),
+	priority: Mule::p('kafka_headers.error_priority_p5'),
+	errorName: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage),
+	errorMessage: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage)
+}&#93;&#93;>
+							</ee:set-variable>
+							<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+&#45;&#45;-
+405&#93;&#93;>
+							</ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="common-error-logic-subflow" doc:id="612ce86e-f962-4ff7-98a3-6e44b2ca5594" name="common-error-logic-subflow" />
+				</when>
+				<when expression='#[vars.errorObject.errorType.identifier == "NOT_ACCEPTABLE"&#93;'>
+					<ee:transform doc:name="set-error-details" doc:id="1097221b-048c-4ebd-96b1-a79fcb908469">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="errorDetails"><![CDATA[%dw 2.0
+var errorMessage=" can not accept request type"
+output application/json
+&#45;&#45;-
+{
+	errorCode: Mule::p('error.code11'),
+	priority: Mule::p('kafka_headers.error_priority_p5'),
+	errorName: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage),
+	errorMessage: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage)
+}&#93;&#93;>
+							</ee:set-variable>
+							<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+&#45;&#45;-
+406&#93;&#93;>
+							</ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="common-error-logic-subflow" doc:id="a52527a3-c6bd-452e-b0e4-52878ec86cff" name="common-error-logic-subflow" />
+				</when>
+				<when expression='#[vars.errorObject.errorType.identifier == "UNSUPPORTED_MEDIA_TYPE"&#93;'>
+					<ee:transform doc:name="set-error-details" doc:id="cb6d9576-b355-4fbb-8b61-96e295061894">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="errorDetails"><![CDATA[%dw 2.0
+var errorMessage=" can not support the media type"
+output application/json
+&#45;&#45;-
+{
+	errorCode: Mule::p('error.code12'),
+	priority: Mule::p('kafka_headers.error_priority_p5'),
+	errorName: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage),
+	errorMessage: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage)
+}&#93;&#93;>
+							</ee:set-variable>
+							<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+&#45;&#45;-
+415&#93;&#93;>
+							</ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="common-error-logic-subflow" doc:id="c097148d-d5b5-446c-b229-d5c89642f5e3" name="common-error-logic-subflow" />
+				</when>
+				<when expression='#[vars.errorObject.errorType.identifier == "INTERNAL_SERVER_ERROR"&#93;'>
+					<ee:transform doc:name="set-error-details" doc:id="d357bc4c-75fa-4c10-8c97-dfcc96a2923e">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="errorDetails"><![CDATA[%dw 2.0
+var errorMessage=" internal server error"
+output application/json
+&#45;&#45;-
+{
+	errorCode: Mule::p('error.code13'),
+	priority: Mule::p('kafka_headers.error_priority_p5'),
+	errorName: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage),
+	errorMessage: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage)
+}&#93;&#93;>
+							</ee:set-variable>
+							<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+&#45;&#45;-
+500&#93;&#93;>
+							</ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="common-error-logic-subflow" doc:id="2a25d4c8-185b-47a3-b152-e5b1a5be1c9b" name="common-error-logic-subflow" />
+				</when>
+				<when expression='#[vars.errorObject.errorType.identifier == "UNAUTHORIZED" or vars.errorObject.errorType.identifier == "CLIENT_SECURITY" or vars.errorObject.errorType.identifier == "SECURITY"&#93;'>
+					<ee:transform doc:name="set-error-details" doc:id="238b938b-92c9-45dd-91c5-a875a8b101ee">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="errorDetails"><![CDATA[%dw 2.0
+var errorMessage=" did not authorize the request"
+output application/json
+&#45;&#45;-
+{
+	errorCode: Mule::p('error.code14'),
+	priority: Mule::p('kafka_headers.error_priority_p5'),
+	errorName: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage),
+	errorMessage: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage)
+}&#93;&#93;>
+							</ee:set-variable>
+							<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+&#45;&#45;-
+401&#93;&#93;>
+							</ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="common-error-logic-subflow" doc:id="0fcc9924-260e-4ab7-a80d-ed38262e97f7" name="common-error-logic-subflow" />
+				</when>
+				<when expression='#[vars.errorObject.errorType.identifier == "FORBIDDEN"&#93;'>
+					<ee:transform doc:name="set-error-details" doc:id="392fc4e1-3fdc-472f-807a-fe8f812f7fdc">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="errorDetails"><![CDATA[%dw 2.0
+var errorMessage1="Access to the " ++ vars.upstreamServiceName default "" ++ " is forbidden"
+var errorMessage2="Access to the Upstream service is forbidden"
+output application/json
+&#45;&#45;-
+{
+	errorCode: Mule::p('error.code15'),
+	priority: Mule::p('kafka_headers.error_priority_p5'),
+	errorName: if(vars.upstreamServiceName?) errorMessage1 else errorMessage2,
+	errorMessage: if(vars.upstreamServiceName?) errorMessage1 else errorMessage2
+}&#93;&#93;>
+							</ee:set-variable>
+							<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+&#45;&#45;-
+403&#93;&#93;>
+							</ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="common-error-logic-subflow" doc:id="e7bde6b3-f3b0-439a-b2fb-24118ebeb67c" name="common-error-logic-subflow" />
+				</when>
+				<when expression='#[vars.errorObject.errorType.identifier == "BAD_GATEWAY"&#93;'>
+					<ee:transform doc:name="set-error-details" doc:id="3cfe3d1c-0f81-4365-8a30-cfb257725bf5">
+						<ee:message>
+						</ee:message>
+						<ee:variables>
+							<ee:set-variable variableName="errorDetails"><![CDATA[%dw 2.0
+output application/json
+var errorMessage1="Check " ++ vars.upstreamServiceName default "" ++ " listener port and TLS configurations"
+var errorMessage2="Check Upstream service listener port and TLS configurations"
+&#45;&#45;-
+{
+	errorCode: Mule::p('error.code16'),
+	priority: Mule::p('kafka_headers.error_priority_p5'),
+	errorName: if(vars.upstreamServiceName?) errorMessage1 else errorMessage2,
+	errorMessage: if(vars.upstreamServiceName?) errorMessage1 else errorMessage2
+}&#93;&#93;>
+							</ee:set-variable>
+							<ee:set-variable variableName="httpStatus"><![CDATA[%dw 2.0
+output application/java
+&#45;&#45;-
+502&#93;&#93;>
+							</ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="common-error-logic-subflow" doc:id="9b85f64a-0be1-45a1-8e8f-1c26f25692ab" name="common-error-logic-subflow" />
+				</when>
+				<otherwise >
+					<ee:transform doc:name="set-error-details" doc:id="2edb564d-b357-4364-85b7-aa4c13bd95fb" >
+						<ee:message >
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="errorDetails" ><![CDATA[%dw 2.0
+var errorMessage=" internal server error"
+output application/json
+&#45;&#45;-
+{
+	errorCode: Mule::p('error.code17'),
+	priority: Mule::p('kafka_headers.error_priority_p5'),
+	errorName: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage),
+	errorMessage: if(vars.upstreamServiceName?) (vars.upstreamServiceName ++ errorMessage) else ("Upstream service" ++ errorMessage)
+}&#93;&#93;>
+							</ee:set-variable>
+							<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+&#45;&#45;-
+500&#93;&#93;>
+							</ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<flow-ref doc:name="common-error-logic-subflow" doc:id="6836035e-bada-4870-a689-2745975d2699" name="common-error-logic-subflow"/>
+				</otherwise>
+			</choice>
+		</on-error-propagate> [STUDIO] -->
+		<on-error-propagate enableNotifications="true" logException="true" doc:name="On Error Propagate" doc:id="4802fef6-b3aa-42bb-864b-ee7c8736c370" >
+			<ee:transform doc:name="set-error-details" doc:id="d6141ee4-d0e8-4c22-9d1d-895a360c392b" >
+				<ee:message >
+				</ee:message>
+				<ee:variables >
+					<ee:set-variable variableName="httpStatus" ><![CDATA[%dw 2.0
+output application/java
+---
+400]]>
+					</ee:set-variable>
+					<ee:set-variable variableName="errorDetails" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	errorName: error.errorType.identifier,
+	errorMessage: error.detailedDescription
+}]]>
+					</ee:set-variable>
+				</ee:variables>
+			</ee:transform>
+			<flow-ref doc:name="common-error-logic-subflow" doc:id="89815f1d-e068-4c70-92dd-2e1eced3633f" name="common-error-logic-subflow"/>
+		</on-error-propagate>
+	</error-handler>
+	<error-handler name="outbound-global-exception-strategy" doc:id="cf93ce0d-2b66-402c-91ad-858fac1eef8e" >
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b3405daf-f446-4889-ae30-66e864aa5d02" when='#[(error.errorType.identifier != "CONNECTIVITY") and (error.errorType.identifier != "SERVICE_UNAVAILABLE") and (error.errorType.identifier != "TIMEOUT")  and (error.errorType.identifier != "GATEWAY_TIMEOUT") and (error.errorType.identifier != "BAD_GATEWAY")]'>
+			<ee:transform doc:name="set-error-details" doc:id="f65c212e-7cbd-4b3c-a275-da19e92af23c">
+				<ee:message>
+				</ee:message>
+				<ee:variables>
+					<ee:set-variable variableName="errorObject"><![CDATA[%dw 2.0
+output application/json
+---
+error]]></ee:set-variable>
+					</ee:variables>
+			</ee:transform>
+		</on-error-continue>
+	</error-handler>
+	
+	<sub-flow name="common-error-logic-subflow" doc:id="c3d88589-0159-44a8-b3f6-2c617db48c8c" >
+		<ee:transform doc:name="prepare-error-message" doc:id="1a4d3198-1c66-4873-96bf-cd817170320c">
+			<ee:message>
+				<ee:set-payload resource="dwl/error_response_message.dwl" />
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="error-log-subflow" doc:id="2f9100ed-a71e-4d67-b664-67a3acb349d1" name="error-log-subflow"/>
+	</sub-flow>
+
+</mule>

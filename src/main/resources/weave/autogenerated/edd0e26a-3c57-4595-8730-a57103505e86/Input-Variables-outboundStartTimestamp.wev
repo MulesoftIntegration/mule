@@ -1,0 +1,4 @@
+%dw 2.0
+
+type auto_edd0e26a_3c57_4595_8730_a57103505e86_Input_Variables_outboundStartTimestamp = {| timestamp: Number {"unit": "milliseconds"} |}
+

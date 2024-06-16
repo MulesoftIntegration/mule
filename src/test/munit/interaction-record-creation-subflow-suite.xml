@@ -1,0 +1,559 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="interaction-record-creation-subflow-suite.xml" />
+	<munit:test name="interaction-record-creation-Sub_Flow-test" doc:id="b1644db5-445b-43b7-a267-274f68d1a8c5" >
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="c8aaad73-224b-4576-9e70-d0d63e0c4d2d" >
+				<munit:payload value="#[output application/json  --- readUrl('classpath://interactionrecordcreationSubFlowtest\set-event_payload.dwl')]" encoding="UTF-8" mediaType="application/json " />
+				<munit:attributes value="#[readUrl('classpath://interactionrecordcreationSubFlowtest\set-event_attributes.dwl')]" />
+				<munit:variables >
+					<munit:variable key="outboundHeaders" value="#[readUrl('classpath://interactionrecordcreationSubFlowtest\set-event_variable_.dwl')]" />
+					<munit:variable key="resourceStartTimestamp" value="#[output application/json --- readUrl('classpath://interactionrecordcreationSubFlowtest\set-event_variable_1.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			</munit:set-event>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to interaction-record-creation-Sub_Flow" doc:id="285e78e3-7181-4321-9c0f-f4f19cbe7d2e" name="interaction-record-creation-Sub_Flow"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="api-interaction-record-proc-test-suite-post:\interaction\record:api-interaction-record-proc-configTest" doc:id="5e1659b3-5e2a-4c3d-b737-5c83ba369450" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="4d58c860-0f15-49b5-88c4-3e42dbe65bd0" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="interaction-record-creation-Sub_Flow" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to post:\interaction\record:api-interaction-record-proc-config" doc:id="12461d7a-5edd-490d-8715-4bd74e8a9f4f" name="post:\interaction\record:api-interaction-record-proc-config"/>
+		</munit:execution>
+	</munit:test>
+	<munit:test name="APIKIT:BAD_REQUEST" doc:id="3dbbbd7e-386f-4e4f-92b9-529f60615d0e" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="apikit:router" doc:id="3afc6a73-cef5-4818-9658-e95838ba9670" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="api-interaction-record-proc-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:BAD_REQUEST" />
+				</munit-tools:then-return>
+			
+
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="199b2f92-03f8-451f-a7c5-0aca629ec778" >
+				<flow-ref doc:name="Flow-ref to api-interaction-record-proc-main" doc:id="922f4d57-8c7e-46c1-aa8e-76bf9ccafd07" name="api-interaction-record-proc-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="856d17de-4067-424a-b309-8831491deaba" >
+						<logger level="INFO" doc:name="Continue" doc:id="43a2ff2f-a271-4f9d-b4f8-276891b24a65" message="Continue"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="544da2d5-4606-4286-963a-b0270d2c4176" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="APIKIT:NOT_FOUND" doc:id="77a5e456-ac8d-4790-a1ee-3e614c2ad1f8" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="apikit:router" doc:id="4f29f1c8-6d87-4c80-9664-50750497268a" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="api-interaction-record-proc-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_FOUND" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="bc9043ee-925d-4506-b136-b8fbf3e19450" >
+				<flow-ref doc:name="Flow-ref to api-interaction-record-proc-main" doc:id="cb17cdcb-054a-4d10-9f89-95a4bba574a2" name="api-interaction-record-proc-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b3661cb6-2d32-4c99-b748-539fb616a13e" >
+						<logger level="INFO" doc:name="Continue" doc:id="965c896c-cd5f-43f5-83d7-e82914a4dc80" message="Continue"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="316d320a-e09c-433f-8fa0-072ee28b0d61" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+
+<munit:test name="APIKIT:METHOD_NOT_ALLOWED" doc:id="940648ad-53cf-4b4c-90a1-828d013ece49" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="apikit:router" doc:id="5d1e4cc1-5acd-4035-bbc8-222df0ac0520" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="api-interaction-record-proc-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:METHOD_NOT_ALLOWED" />
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="6269696f-884d-46dd-8a0e-b8a6376da91f" >
+				<flow-ref doc:name="Flow-ref to api-interaction-record-proc-main" doc:id="a82f52de-26d9-40f2-b0ea-e568bd75b5cf" name="api-interaction-record-proc-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="6bf28411-0e9a-4564-8d50-c8f9f7893a10" >
+						<logger level="INFO" doc:name="Continue" doc:id="e4981f9e-4ffe-4e45-aa9c-2897496dff5d" message="Continue"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="a223156e-e8a5-4834-8eec-9be6b9ede3b1" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="APIKIT:NOT_ACCEPTABLE" doc:id="3c0ac951-1a92-4240-a6c3-0fe1182ba376" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="apikit:router" doc:id="2d34ac94-25ac-414d-89fc-71a85fa0b516" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="api-interaction-record-proc-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:NOT_ACCEPTABLE " />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="ec328af1-1db9-4ff0-aae3-03955cc206b9" >
+				<flow-ref doc:name="Flow-ref to api-interaction-record-proc-main" doc:id="160c3a00-2bf4-47b4-a4ad-10a62fb49a2e" name="api-interaction-record-proc-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="3839abab-d979-4753-8346-999bc509bd8c" >
+						<logger level="INFO" doc:name="Continue" doc:id="f25eb5b8-843c-4ddf-83f3-4a3ef1ea5e20" message="Continue"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="6c6fcc42-188c-4596-a686-4d2f57e653e1" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="APIKIT:UNSUPPORTED_MEDIA_TYPE" doc:id="bec435d3-a501-4d88-869e-8d5e2d2f4be9" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="apikit:router" doc:id="d15a332a-972b-4cc2-89cf-1f2f77a48b66" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="api-interaction-record-proc-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APIKIT:UNSUPPORTED_MEDIA_TYPE " />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="0c72fdd2-ea9f-4f05-b1e9-b71ef3271c41" >
+				<flow-ref doc:name="Flow-ref to api-interaction-record-proc-main" doc:id="c54bc738-5fe5-468f-9a9f-761c72e06d22" name="api-interaction-record-proc-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="7cfd0a5d-5613-45cc-84a4-0f33c48d060b" >
+						<logger level="INFO" doc:name="Continue" doc:id="7f0cc223-a15b-43bf-8f30-3abd924966ac" message="Continue"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="b1acce33-25cc-4de6-aa5a-826ad4c9c50a" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="MULE:RETRY_EXHAUSTED" doc:id="07b1ecd4-4293-4293-8d74-176516879c67" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="apikit:router" doc:id="535d49e6-a20e-49ca-8a9f-d21442be44ff" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="api-interaction-record-proc-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="MULE:RETRY_EXHAUSTED " />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="2cc1533b-2961-4d9d-ba30-d5b744731ed1" >
+				<flow-ref doc:name="Flow-ref to api-interaction-record-proc-main" doc:id="d6ee8b80-c0fa-47ce-b5b5-2a24b8d18c60" name="api-interaction-record-proc-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="ff6f0b1c-4093-495d-8abc-dc3fc91fb66c" >
+						<logger level="INFO" doc:name="Continue" doc:id="67a298e2-5f63-441a-b55f-ba0672609c2f" message="Continue"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="bbfa154c-b37c-4529-b43f-6792b58b4cb0" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="MULE:EXPRESSION" doc:id="1c1f43a6-3461-4df5-828e-8b323d74bfbe" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="apikit:router" doc:id="067ab1e0-ab38-4fb6-ac2b-622e37937419" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="api-interaction-record-proc-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="MULE:EXPRESSION " />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="327981b1-4bd6-4576-bc6d-29e9d3398a38" >
+				<flow-ref doc:name="Flow-ref to api-interaction-record-proc-main" doc:id="1e241c20-0115-4a3d-b15c-ad6b3ba3f527" name="api-interaction-record-proc-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b47c1076-3f8b-4272-aaf5-2aa2fd638974" >
+						<logger level="INFO" doc:name="Continue" doc:id="ed05369e-db51-4308-ba37-c56382fb793d" message="Continue"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="f65b3c84-4c04-4097-a94c-ea8f825b80fa" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="APP:HTTP_REQUEST_ERROR" doc:id="64e24ef9-7584-4a46-a346-ea6bdbe7c204" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="set-transactions-data-subflow" doc:id="e161d17b-01f4-402b-a35e-21451ae40f4b" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="set-transactions-data-subflow" attributeName="doc:name" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APP:HTTP_REQUEST_ERROR " />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="30fb5b65-a95f-4ca6-aac3-d073e5f1ee66" >
+				<flow-ref doc:name="Flow-ref to api-interaction-record-proc-main" doc:id="1bbf088b-5dee-4a91-ab18-3b8e25355464" name="api-interaction-record-proc-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="48d42761-2b72-472b-ae24-ef3010a93220" >
+						<logger level="INFO" doc:name="Continue" doc:id="21cc3224-424d-4f3a-b059-c14fd6d2b540" message="Continue"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="43c280c2-f2fb-47c4-9e16-b6d77fdfba41" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="APP:HTTP_REQUEST_ERROR-BAD_REQUEST" doc:id="b9a56e9f-5788-40f8-91d4-81890073c218" description="Test">
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="0590b4f3-a3c7-4e88-bc12-c1e082313317" >
+				<munit:payload value='"TEST"' />
+				<munit:variables >
+					<munit:variable key="errorObject" value="#[output application/json --- readUrl('classpath://output\setpayload_badrequest.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			
+
+</munit:set-event>
+			<munit-tools:mock-when doc:name="apikit:router" doc:id="cd91e0af-d891-42c0-bb42-74123ed84eff" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="api-interaction-record-proc-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APP:HTTP_REQUEST_ERROR " />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="c9b1c79b-bc4d-4c99-9293-6d18cb9da04a" >
+				<flow-ref doc:name="Flow-ref to api-interaction-record-proc-main" doc:id="c46ad43d-c5fa-4ce6-a447-a32e643c2b29" name="api-interaction-record-proc-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="573704d6-02b2-4da0-be55-5e97eeea27f7" >
+						<logger level="INFO" doc:name="Continue" doc:id="c892176d-cd13-418c-9ae2-5d86a5476ae6" message="Continue"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="50c9591e-babe-4181-b3b9-b0ec3bba163a" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="APP:HTTP_REQUEST_ERROR-NOT_FOUND" doc:id="302acbc1-2dfb-457e-8938-a2d29a415b2c" description="Test">
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="b4e098e9-2fea-486b-997a-6f7a05e642fb" >
+				<munit:payload value='"TEST"' />
+				<munit:variables >
+					<munit:variable key="errorObject" value="#[output application/json --- readUrl('classpath://output\setpayload_notfound.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			
+
+</munit:set-event>
+			<munit-tools:mock-when doc:name="apikit:router" doc:id="aeebaf0d-65b3-4e15-80d0-84d31d4b2a0f" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="api-interaction-record-proc-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APP:HTTP_REQUEST_ERROR " />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="bbc63d09-ef9b-4b6d-9c6c-b27a6687732a" >
+				<flow-ref doc:name="Flow-ref to api-interaction-record-proc-main" doc:id="b2e7099d-3750-4683-8921-7aef4748aab8" name="api-interaction-record-proc-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="26ac2230-c6cc-4882-bae3-d3ba3933e723" >
+						<logger level="INFO" doc:name="Continue" doc:id="83b97106-e0d4-4572-9ccf-603a23f138e5" message="Continue"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="d0a41328-95be-4f85-9d6c-3ea30dadf719" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+
+<munit:test name="APP:HTTP_REQUEST_ERROR-METHOD_NOT_ALLOWED" doc:id="2af23b39-8daf-4446-b762-7fcbf6bed390" description="Test">
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="8ca5d2a7-2f6c-49c6-87d1-a4b316ff85ca" >
+				<munit:payload value='"TEST"' />
+				<munit:variables >
+					<munit:variable key="errorObject" value="#[output application/json --- readUrl('classpath://output\setpayload_methodnotfound.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			
+
+</munit:set-event>
+			<munit-tools:mock-when doc:name="apikit:router" doc:id="9543d103-d00e-489e-bc90-a768a09582e3" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="api-interaction-record-proc-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APP:HTTP_REQUEST_ERROR " />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="fecd4a28-3fdc-456f-816b-832be2f8d222" >
+				<flow-ref doc:name="Flow-ref to api-interaction-record-proc-main" doc:id="dd268e6f-d26f-4495-a100-c854b771476d" name="api-interaction-record-proc-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="1f581d6f-f14b-465d-8435-e2f6c340b17f" >
+						<logger level="INFO" doc:name="Continue" doc:id="b660d868-7961-47e0-8218-ade43e668c5e" message="Continue"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="0a810c46-4108-4ba7-96c3-620b2b6f0a46" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+
+
+
+<munit:test name="APP:HTTP_REQUEST_ERROR-METHOD_NOT_ACCEPTABLE" doc:id="bcb2f005-46e9-4f15-bd7c-57408e33b487" description="Test">
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="89151bf7-0964-47a7-a63a-171f345ffee3" >
+				<munit:payload value='"TEST"' />
+				<munit:variables >
+					<munit:variable key="errorObject" value="#[output application/json --- readUrl('classpath://output\setpayload_methodnotacceptable.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			
+
+</munit:set-event>
+			<munit-tools:mock-when doc:name="apikit:router" doc:id="d83465f3-6456-4a15-8472-2b9d550beaef" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="api-interaction-record-proc-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APP:HTTP_REQUEST_ERROR " />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="c170d72e-5870-4525-bef7-c3c71f124b70" >
+				<flow-ref doc:name="Flow-ref to api-interaction-record-proc-main" doc:id="e53fe869-cf1f-4c06-993c-f4ce674106ce" name="api-interaction-record-proc-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="75763d36-c76f-41e6-a0f6-14ecbc6ba199" >
+						<logger level="INFO" doc:name="Continue" doc:id="9daf0669-4e2c-4a2a-92da-de2e23ed2aa9" message="Continue"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="ec6ad025-7964-4552-96ae-e6c7e23e2db6" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="APP:HTTP_REQUEST_ERROR-UNSUPPORTED_MEDIA_TYPE" doc:id="ad49556c-14e4-4622-9862-46a307067758" description="Test">
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="ee9d0fdd-d6cc-43c9-afd5-126a6e3ab852" >
+				<munit:payload value='"TEST"' />
+				<munit:variables >
+					<munit:variable key="errorObject" value="#[output application/json --- readUrl('classpath://output\setpayload_unsupportedmediatype.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			
+
+</munit:set-event>
+			<munit-tools:mock-when doc:name="apikit:router" doc:id="f9f8b289-dc31-46c0-9fba-21618e376320" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="api-interaction-record-proc-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APP:HTTP_REQUEST_ERROR " />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="04047e18-f311-426a-ac7b-1eb013491727" >
+				<flow-ref doc:name="Flow-ref to api-interaction-record-proc-main" doc:id="2c312557-098f-4110-85ce-8ec16146409c" name="api-interaction-record-proc-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="98756a15-eda1-4d2f-8890-1ebb02ee5bdc" >
+						<logger level="INFO" doc:name="Continue" doc:id="f12dcffd-1553-40a1-ad3e-57c0d5125cd2" message="Continue"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="ae6af5cc-550c-4bd7-8723-0d20982b4f7d" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="APP:HTTP_REQUEST_ERROR-INTERNAL_SERVER_ERROR" doc:id="6be992e5-28e7-4ea1-b4ef-19d484949f16" description="Test">
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="b0953bb2-07f5-4e18-93b2-6f1fadcd7b7e" >
+				<munit:payload value='"TEST"' />
+				<munit:variables >
+					<munit:variable key="errorObject" value="#[output application/json --- readUrl('classpath://output\setpayload_internalservererror.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			
+
+</munit:set-event>
+			<munit-tools:mock-when doc:name="apikit:router" doc:id="ec47ddf4-bff6-44c6-9051-f52e805dda53" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="api-interaction-record-proc-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APP:HTTP_REQUEST_ERROR " />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="233dbc09-91d0-4608-8b1b-7e9e101c1904" >
+				<flow-ref doc:name="Flow-ref to api-interaction-record-proc-main" doc:id="be3b87fe-74ad-4e7a-8c76-83597a2e4db7" name="api-interaction-record-proc-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="48c037bb-3f7a-4192-8f0b-ad9ac3a06e68" >
+						<logger level="INFO" doc:name="Continue" doc:id="463bd860-857f-47e6-b024-6b1e44140edd" message="Continue"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="3d404024-be01-480f-887f-a00926f876e0" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+
+
+<munit:test name="APP:HTTP_REQUEST_ERROR-UNAUTHORIZED" doc:id="2d03cdb9-d5ca-41d6-a0ae-b3bacee363ad" description="Test">
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="af511de4-c52b-4e71-aa97-766e7f2013f1" >
+				<munit:payload value='"TEST"' />
+				<munit:variables >
+					<munit:variable key="errorObject" value="#[output application/json --- readUrl('classpath://output\setpayload_unauthorized.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			
+
+</munit:set-event>
+			<munit-tools:mock-when doc:name="apikit:router" doc:id="d4d64c10-8a8a-4fbe-a797-15d47d8e6c60" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="api-interaction-record-proc-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APP:HTTP_REQUEST_ERROR " />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="8517b40b-40e2-4dc8-9259-b0e30cf387c1" >
+				<flow-ref doc:name="Flow-ref to api-interaction-record-proc-main" doc:id="7267a04e-851e-48a0-9003-3506184e2611" name="api-interaction-record-proc-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="17ff6254-46b7-4c87-937c-6dfb3419a773" >
+						<logger level="INFO" doc:name="Continue" doc:id="59b90caa-af1b-4f17-a7ac-e36ba949018c" message="Continue"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="b682dd46-42e7-48ce-a4fb-a4461f216ad5" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+
+
+	
+	<munit:test name="FORBIDDEN1" doc:id="b9a3863f-a6d9-4235-a1ae-b045653ff8bf" description="Test">
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="98f0b0b5-e62a-4ed5-a6cb-b2546f8fe1f8" >
+				<munit:payload value='"TEST"' />
+				<munit:variables >
+					<munit:variable key="errorObject" value="#[output application/json --- readUrl('classpath://output\setpayload_forbidden.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			
+
+</munit:set-event>
+			<munit-tools:mock-when doc:name="apikit:router" doc:id="ecf93778-96ad-4d57-bbb5-d360c9858846" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="api-interaction-record-proc-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APP:HTTP_REQUEST_ERROR " />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="fcd4f617-06b0-40ef-8964-03a3b9d52d85" >
+				<flow-ref doc:name="Flow-ref to api-interaction-record-proc-main" doc:id="302ce6aa-db9a-4df6-8780-e8dc5b04523a" name="api-interaction-record-proc-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="99ae3d3b-4a59-46f6-8eab-e006999ec3a6" >
+						<logger level="INFO" doc:name="Continue" doc:id="5b2dd666-5267-47d6-b368-9c0c83c9db4d" message="Continue"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="b7cdb1b1-e595-48d3-809e-31feb0b0f3bb" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+	
+	<munit:test name="BAD_GATEWAY" doc:id="5fb20956-09d6-4a7b-8476-bd3ac0e9f42c" description="Test">
+		<munit:behavior >
+			<munit:set-event doc:name="Set Input" doc:id="44609c24-f018-4487-b9b0-6e9d0e73d067" >
+				<munit:payload value='"TEST"' />
+				<munit:variables >
+					<munit:variable key="errorObject" value="#[output application/json --- readUrl('classpath://output\setpayload_badgateway.dwl')]" encoding="UTF-8" mediaType="application/json" />
+				</munit:variables>
+			
+
+</munit:set-event>
+			<munit-tools:mock-when doc:name="apikit:router" doc:id="05cdece6-2404-4f9e-8900-856fc83c2ec8" processor="apikit:router">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="api-interaction-record-proc-config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="APP:HTTP_REQUEST_ERROR " />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<try doc:name="Try" doc:id="1be1ed40-741a-41e0-a8b7-3ba7ce37b7f5" >
+				<flow-ref doc:name="Flow-ref to api-interaction-record-proc-main" doc:id="5d77151e-6a4a-44a5-a1f4-d8fe3e427dbb" name="api-interaction-record-proc-main" />
+				<error-handler >
+					<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="22b01fa0-4dda-4f46-b8cb-8e50b81fa676" >
+						<logger level="INFO" doc:name="Continue" doc:id="11a87b8f-7ada-4b01-8300-919653ecf8ce" message="Continue"/>
+					</on-error-continue>
+				</error-handler>
+			</try>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="9d94fc71-8b77-4ef1-a0cc-51f4c7f7e1b0" expression="#[payload]" is="#[MunitTools::notNullValue()]"/>
+		</munit:validation>
+	</munit:test>
+
+</mule>

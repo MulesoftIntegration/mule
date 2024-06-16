@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/mule-apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/mule-apikit http://www.mulesoft.org/schema/mule/mule-apikit/current/mule-apikit.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd ">
+    <apikit:config name="api-interaction-record-proc-config" api="resource::370f98c6-349c-45fb-8002-9d03c71c0f19:api-interaction-record-proc:1.0.5:raml:zip:api-interaction-record-proc.raml" outboundHeadersMapName="outboundHeaders" httpStatusVarName="httpStatus" />
+    <flow name="api-interaction-record-proc-main">
+        <http:listener path="/api/*" config-ref="api-interaction-record-proc-httpsListenerConfig">
+            <http:response statusCode="#[vars.httpStatus default 200]">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500]">
+                <http:body><![CDATA[#[payload]]]></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:router config-ref="api-interaction-record-proc-config" />
+        <error-handler ref="global-exception-strategy">
+            
+        </error-handler>
+    </flow>
+    <!-- [STUDIO:"api-interaction-record-proc-console"]<flow name="api-interaction-record-proc-console">
+        <http:listener path="/console/*" config-ref="api-interaction-record-proc-httpsListenerConfig">
+            <http:response statusCode="#[vars.httpStatus default 200&#93;">
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}&#93;&#93;&#93;></http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.httpStatus default 500&#93;">
+                <http:body><![CDATA[#[payload&#93;&#93;&#93;></http:body>
+                <http:headers><![CDATA[#[vars.outboundHeaders default {}&#93;&#93;&#93;></http:headers>
+            </http:error-response>
+        </http:listener>
+        <apikit:console config-ref="api-interaction-record-proc-config" />
+        <error-handler ref="global-exception-strategy">
+            
+        </error-handler>
+    </flow> [STUDIO] -->
+    <flow name="post:\interaction\record:api-interaction-record-proc-config">
+		<flow-ref doc:name="resource-start-log-subflow" doc:id="140e51c8-d390-4c19-a74b-32d8f7fe575a" name="resource-start-log-subflow"/>
+		<flow-ref doc:name="interaction-record-creation-Sub_Flow" doc:id="865d1e51-5077-48d6-a4d9-3bbd5d738f34" name="interaction-record-creation-Sub_Flow"/>
+		<flow-ref doc:name="resource-end-log-subflow" doc:id="478291ff-7d4c-4101-b0cd-3d7879d9e714" name="resource-end-log-subflow"/>
+    </flow>
+</mule>

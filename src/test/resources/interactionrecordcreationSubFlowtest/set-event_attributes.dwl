@@ -1,0 +1,30 @@
+{
+  "headers": {
+    "client_id": "0ac8ebd5ada84efaa4fc344688b960d1",
+    "client_secret": "dF09B384B30b472995165197E0075f93",
+    "content-type": "application/json",
+    "user-agent": "PostmanRuntime/7.37.0",
+    "accept": "*/*",
+    "postman-token": "762bc37d-f980-420c-8ccf-08f739fa78d9",
+    "host": "0.0.0.0:8083",
+    "accept-encoding": "gzip, deflate, br",
+    "connection": "keep-alive",
+    "content-length": "282"
+  },
+  "clientCertificate": null,
+  "method": "POST",
+  "scheme": "https",
+  "queryParams": {},
+  "requestUri": "/api/interaction/record",
+  "queryString": "",
+  "version": "HTTP/1.1",
+  "maskedRequestPath": "/interaction/record",
+  "listenerPath": "/api/*",
+  "relativePath": "/api/interaction/record",
+  "localAddress": "/127.0.0.1:8083",
+  "uriParams": {},
+  "rawRequestUri": "/api/interaction/record",
+  "rawRequestPath": "/api/interaction/record",
+  "remoteAddress": "/127.0.0.1:57194",
+  "requestPath": "/api/interaction/record"
+}

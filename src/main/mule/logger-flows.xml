@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<!-- [STUDIO:"start-log-subflow"]<sub-flow name="start-log-subflow" doc:id="672b1ea6-468e-42a6-9512-9fb2abacb1a0" >
+		<ee:transform doc:name="set-flow-start-timestamp" doc:id="e17f39fd-aa2b-4e5e-bb9d-235a55df31d1" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="flowStartTimestamp" ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{
+	'timestamp': now() as Number {unit: "milliseconds"}
+}&#93;&#93;></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<async doc:name="Async" doc:id="cc0c612e-0cca-46bc-b579-d3c4659d7938" >
+			<set-variable value="#['START'&#93;" doc:name="set-event-name" doc:id="d0b3dde7-f1cc-41cc-884d-ef8816e383e4" variableName="eventName" />
+			<flow-ref doc:name="prepare-logger-message-subflow" doc:id="1119f99b-c013-4229-9d75-d74757cf5e76" name="prepare-logger-message-subflow" />
+			<logger level="INFO" doc:name="flow-start-log" doc:id="c29ce864-729e-45f4-85af-73007fb6e75c" message="#[payload&#93;"/>
+		</async>
+	</sub-flow> [STUDIO] -->
+	<sub-flow name="resource-start-log-subflow" doc:id="646e0960-1d10-4896-a5a3-19da089ad552" >
+		<ee:transform doc:name="set-resource-start-timestamp" doc:id="a7eb9959-80b2-4deb-988e-6a7e44957b0e" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="resourceStartTimestamp" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	'timestamp': now() as Number {unit: "milliseconds"}
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<async doc:name="Async" doc:id="2222fdc0-6729-4faf-b42e-dce5ee862cda" >
+			<set-variable value="#['BEFORE_RESOURCE']" doc:name="set-event-name" doc:id="5c610223-d771-43e5-8972-3722df9ca700" variableName="eventName" />
+			<flow-ref doc:name="prepare-logger-message-subflow" doc:id="6f475d03-549d-4217-a5dc-4c3957ba53cc" name="prepare-logger-message-subflow" />
+			<logger level="INFO" doc:name="resource-start-log" doc:id="e0f6ebd2-6a1c-4acd-81cd-fab695ce8cc3" message="#[payload]"/>
+		</async>
+	</sub-flow>
+	<sub-flow name="outbound-start-log-subflow" doc:id="f5ad6f3e-d538-453f-b083-194fe1d8445b" >
+		<ee:transform doc:name="set-outbound-start-timestamp" doc:id="d35dd815-dc5c-4810-bde9-2f9626b2aa2d" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="outboundStartTimestamp" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	'timestamp': now() as Number {unit: "milliseconds"}
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<async doc:name="Async" doc:id="2beac52e-9599-4d34-927d-c632980906bf" >
+			<set-variable value="#['BEFORE_OUTBOUND' ++ &quot;-&quot; ++ vars.upstreamServiceName]" doc:name="set-event-name" doc:id="56529bce-a3e4-471f-abea-8df3ff521ee4" variableName="eventName" />
+			<flow-ref doc:name="prepare-logger-message-subflow" doc:id="a7239443-481c-4e09-b300-8eeccee41d7b" name="prepare-logger-message-subflow" />
+			<logger level="INFO" doc:name="outbound-start-log" doc:id="f903ba34-c286-4e7d-a4e2-7436f5cf965a" message="#[payload]"/>
+		</async>
+	</sub-flow>
+	<!-- [STUDIO:"end-log-subflow"]<sub-flow name="end-log-subflow" doc:id="ecbde398-f154-49c2-a2e0-be548090499f" >
+		<ee:transform doc:name="set-end-log-timestamp" doc:id="679c7916-de32-476f-aede-5616635fcf2e" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="flowStartTimestamp" ><![CDATA[%dw 2.0
+output application/json
+&#45;&#45;-
+{
+	'timestamp': now() as Number {unit: "milliseconds"}
+}&#93;&#93;></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<async doc:name="Async" doc:id="f0fc9deb-ae5d-428c-a632-0daac632d6c3" >
+			<set-variable value="#['END'&#93;" doc:name="set-event-name" doc:id="a674702c-b919-4621-bf17-c69dce780786" variableName="eventName" />
+			<flow-ref doc:name="prepare-logger-message-subflow" doc:id="e93cf871-1c12-4c57-8470-a9d25b70c2f8" name="prepare-logger-message-subflow"/>
+			<logger level="INFO" doc:name="flow-end-log" doc:id="58968e0b-7a01-43ca-9f2e-5c54cbd4f760" message="#[payload&#93;"/>
+		</async>
+	</sub-flow> [STUDIO] -->
+	<sub-flow name="resource-end-log-subflow" doc:id="edd0e26a-3c57-4595-8730-a57103505e86" >
+		<ee:transform doc:name="set-resource-end-log-timestamp" doc:id="8a714ffd-809d-41e1-98c7-ce169c2c4862" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="resourceStartTimestamp" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	'timestamp': now() as Number {unit: "milliseconds"}
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<async doc:name="Async" doc:id="f08441d3-8252-4691-b90a-876d79e99201" >
+			<set-variable value="#['AFTER_RESOURCE']" doc:name="set-event-name" doc:id="05a3d223-5932-4c08-ad0b-9008af3fb9f8" variableName="eventName" />
+			<flow-ref doc:name="prepare-logger-message-subflow" doc:id="4fcc1db9-0400-4642-9227-a0e488213087" name="prepare-logger-message-subflow"/>
+			<logger level="INFO" doc:name="resource-end-log" doc:id="f1fdad5e-0604-4766-b3ad-5348a793f926" message="#[payload]"/>
+		</async>
+	</sub-flow>
+	<sub-flow name="outbound-end-log-subflow" doc:id="9348cc13-c980-4fb1-9efb-f5d97b491904" >
+		<ee:transform doc:name="set-outbound-end-log-timestamp" doc:id="68af7927-3839-4f22-8448-591aff703cdb" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="outboundStartTimestamp" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	'timestamp': now() as Number {unit: "milliseconds"}
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<async doc:name="Async" doc:id="83c5efcd-ea36-4e44-bd33-1b1ae7adcc75" >
+			<set-variable value="#['AFTER_OUTBOUND' ++ &quot;-&quot; ++ vars.upstreamServiceName]" doc:name="set-event-name" doc:id="25a678fc-1158-46a0-8eb4-0d70199253e9" variableName="eventName" />
+			<flow-ref doc:name="prepare-logger-message-subflow" doc:id="de95b16e-1f5a-419c-b809-f168dfc4ed01" name="prepare-logger-message-subflow"/>
+			<logger level="INFO" doc:name="outbound-end-log" doc:id="07947f5c-6877-4312-96a6-b073389b58ba" message="#[payload]"/>
+		</async>
+	</sub-flow>
+	<sub-flow name="error-log-subflow" doc:id="ca7c8bc7-84c1-4255-ad95-1aa3178b13ff" >
+		<ee:transform doc:name="set-error-log-timestamp" doc:id="8435f924-8bd5-4b81-8886-a5cc558c893f" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="flowStartTimestamp" ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	'timestamp': now() as Number {unit: "milliseconds"}
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<async doc:name="Async" doc:id="ffe99afd-848b-418f-bad5-f2b6a486eb41" >
+			<set-variable value="#['ERROR']" doc:name="set-event-name" doc:id="4c5cc421-870e-4606-afd1-a294778605fd" variableName="eventName" />
+			<flow-ref doc:name="prepare-logger-message-subflow" doc:id="a6957319-9042-4422-9e3d-081c43d73a5e" name="prepare-logger-message-subflow"/>
+			<logger level="ERROR" doc:name="error-log" doc:id="1fc6abb0-54b7-457e-b13e-67aa1f74f150" message="#[payload]"/>
+		</async>
+	</sub-flow>
+	<sub-flow name="prepare-logger-message-subflow" doc:id="2ec0c02d-9b53-43d1-aaa4-eb8584c72442" >
+		<ee:transform doc:name="prepare-log-message" doc:id="1b4250d0-2f4c-4fe8-a416-1b5aaff36722" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json skipNullOn="everywhere"
+fun calculateLatency(eventName) = (
+	if((eventName contains('START')) or (eventName contains('BEFORE_RESOURCE')) or (eventName contains('BEFORE_TRANSFORM')) or (eventName contains('BEFORE_OUTBOUND'))) {
+		latency: 0
+	} else if(eventName contains('END')) {
+		latency: (now() as Number {unit: "milliseconds"}) - (vars.flowStartTimestamp.timestamp as Number)
+	} else if(eventName contains('AFTER_RESOURCE')) {
+		latency: (now() as Number {unit: "milliseconds"}) - (vars.resourceStartTimestamp.timestamp as Number)
+	} else if(eventName contains('AFTER_TRANSFORM')) {
+		latency: (now() as Number {unit: "milliseconds"}) - (vars.transformStartTimestamp.timestamp as Number)
+	} else if(eventName contains('AFTER_OUTBOUND')) {
+		latency: (now() as Number {unit: "milliseconds"}) - (vars.outboundStartTimestamp.timestamp as Number)
+	} else if(eventName contains('ERROR')) {
+	 	latency: (now() as Number {unit: "milliseconds"}) - (vars.flowStartTimestamp.timestamp as Number)
+	} else {
+		latency: null
+	}
+)
+fun getErrorDetails() = {
+	errorCode: vars.errorDetails.errorCode,
+	errorType: error.errorType.identifier,
+    errorMessage: vars.errorDetails.errorMessage,
+    stackTrace: error.detailedDescription
+		
+}
+---
+{
+	eventName: vars.eventName,
+	timestamp: now(),
+	serviceUri: attributes.requestUri,
+	//('payload': payload) if(Mule::p('log.payload_flag') == 'true'), 
+	elapsed: calculateLatency(vars.eventName).latency,
+	(eventStatus: "Success") if(vars.eventName == 'END' or vars.eventName == 'AFTER_RESOURCE' or vars.eventName == 'AFTER_TRANSFORM'or vars.eventName == 'AFTER_OUTBOUND'),                                                                                                                                                                                                                                                      
+	(eventStatus: "Error") if(vars.eventName == 'ERROR'),
+	(errorDetails: getErrorDetails()) if(vars.eventName == 'ERROR')
+}]]></ee:set-payload>
+			
+</ee:message>
+		</ee:transform>
+	</sub-flow>
+</mule>
