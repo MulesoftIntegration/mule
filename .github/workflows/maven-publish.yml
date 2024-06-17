@@ -1,26 +1,68 @@
-name: Sandbox - Build and Deploy
+name: Build and Deploy to Sandbox
 
 on:
   push:
-    branches: main
-#normally you wouldn't be deploying master branch pushes to Sandbox,
-#but we're keeping things simple! 😁
-
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    
 jobs:
-  buildAndDeploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-#first, we need to checkout our mule application's code
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Build and deploy artifact to sandbox
-#run the maven deploy lifecycle. The -B indicated a batch process,
-#which reduces the amount of logging the deployment does
-        run: mvn -B deploy -DmuleDeploy -s .maven/settings.xml
-#Pass in the secrets we need for deployment as environment variables
-        env:
-          PLATFORM_USERNAME: ${{ secrets.PLATFORM_USERNAME }}
-          PLATFORM_PASSWORD: ${{ secrets.PLATFORM_PASSWORD }}
-          SANDBOX_CLIENT_ID: ${{ secrets.SANDBOX_CLIENT_ID }}
-          SANDBOX_CLIENT_SECRET: ${{ secrets.SANDBOX_CLIENT_SECRET }}
-          BUS_GROUP_ID: ${{ secrets.BUS_GROUP_ID }}
+    - name: Checkout this repo
+      uses: actions/checkout@v3
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'zulu'
+        java-version: 8
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+    - name: Stamp artifact file name with commit hash
+      run: |
+        artifactName1=$(ls target/*.jar | head -1)
+        commitHash=$(git rev-parse --short "$GITHUB_SHA")
+        artifactName2=$(ls target/*.jar | head -1 | sed "s/.jar/-$commitHash.jar/g")
+        mv $artifactName1 $artifactName2
+    - name: Upload artifact 
+      uses: actions/upload-artifact@v3
+      with:
+          name: artifacts
+          path: target/*.jar
+        
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:    
+    - name: Checkout this repo
+      uses: actions/checkout@v3
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-maven-
+    - uses: actions/download-artifact@v3
+      with:
+        name: artifacts
+    - name: Deploy to Sandbox
+      env:
+        USERNAME: ${{ secrets.PLATFORM_PASSWORD }}
+        PASSWORD: ${{ secrets.PLATFORM_USERNAME }}
+         #DECRYPTION_KEY: ${{ secrets.decryption_key }}
+      run: |
+        artifactName=$(ls *.jar | head -1)
+        mvn deploy -DmuleDeploy \
+         -Dmule.artifact=$artifactName \
+         -Danypoint.username="$USERNAME" \
+         -Danypoint.password="$PASSWORD"
+      #  -Ddecryption.key="$DECRYPTION_KEY"
