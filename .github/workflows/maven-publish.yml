@@ -56,8 +56,8 @@ jobs:
         name: artifacts
     - name: Deploy to Sandbox
       env:
-        USERNAME: ${{ secrets.PLATFORM_PASSWORD }}
-        PASSWORD: ${{ secrets.PLATFORM_USERNAME }}
+        USERNAME: ${{ secrets.platform_username }}
+        PASSWORD: ${{ secrets.platform_password }}
          #DECRYPTION_KEY: ${{ secrets.decryption_key }}
       run: |
         artifactName=$(ls *.jar | head -1)
