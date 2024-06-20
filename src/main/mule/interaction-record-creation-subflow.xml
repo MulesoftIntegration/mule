@@ -56,8 +56,7 @@ output application/json skipNullOn = "everywhere"
 		</ee:transform>
 		<flow-ref doc:name="outbound-start-log-subflow" doc:id="9773b7f9-ea55-4855-b991-c5ea63e65717" name="outbound-start-log-subflow" />
 		<logger level="INFO" doc:name="request-payload-to-sap" doc:id="dcbd1bcd-ca3f-4c1d-9b72-063334319090" message='SAP DR6 Interaction Record Creation request payload is ::: #[payload]' />
-		<until-successful maxRetries="3" doc:name="Until Successful" doc:id="650f4f1a-3f81-4526-bb24-1f3e6d40cfd6" >
-			<try doc:name="Try" doc:id="14263d7a-103b-451c-98e0-75019abcb278">
+		<try doc:name="Try" doc:id="14263d7a-103b-451c-98e0-75019abcb278" >
 			<http:request method="POST" doc:name="Request SAP BR6 INTERACTION RECORD CREATION" doc:id="6928ce4e-0551-41b8-8a23-b7103cebe7be" config-ref="HTTPS_Request_configuration" path="bapi/interaction/record" responseTimeout="9999999" sendCorrelationId="AUTO">
 			<http:headers><![CDATA[#[output application/java
 ---
@@ -66,9 +65,12 @@ output application/json skipNullOn = "everywhere"
 	"client_id" : p('sap.sys.client_id')
 }]]]></http:headers>
 		</http:request>
-				<error-handler ref="outbound-global-exception-strategy" />
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="ae125880-5421-4139-8d35-d0f4f7ec8200" when='#[(error.errorType.identifier != "CONNECTIVITY") and (error.errorType.identifier != "SERVICE_UNAVAILABLE") and (error.errorType.identifier != "TIMEOUT") and (error.errorType.identifier != "GATEWAY_TIMEOUT") and (error.errorType.identifier != "BAD_GATEWAY") and (error.errorType.identifier != "REMOTELY_CLOSED") and (error.muleMessage.typedValue.name != "SYSTEM_ERROR")]' >
+					<set-variable value="#[error]" doc:name="Set Variable" doc:id="efecd4ab-c552-45a8-b24a-dc4b406ac68d" variableName="errorObject" />
+				</on-error-continue>
+			</error-handler>
 		</try>
-		</until-successful>
 		<choice doc:name="Choice" doc:id="1dcbc382-a343-425e-b130-3c68ee22f31d">
 			<when expression='#[((vars.errorObject == null) or (vars.errorObject == "")) and (isEmpty(payload.errorCode))]'>
 				<ee:transform doc:name="Transform Message" doc:id="d50b194a-a780-462e-b2b8-54937d8b5b9d">

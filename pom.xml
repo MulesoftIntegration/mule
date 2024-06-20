@@ -55,15 +55,6 @@
 					</coverage>
 				</configuration>
 			</plugin> -->
-			  <plugin>
-    <groupId>org.mule.tools.maven</groupId>
-    <artifactId>mule-maven-plugin</artifactId>
-    <version>${mule.maven.plugin.version}</version>
-    <extensions>true</extensions>
-    <configuration>
-      <classifier>mule-application</classifier>
-    </configuration>
-  </plugin>
 		</plugins>
 	</build>
 
@@ -86,7 +77,7 @@
 			<version>1.9.1</version>
 			<classifier>mule-plugin</classifier>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>com.mulesoft.munit</groupId>
 			<artifactId>munit-runner</artifactId>
 			<version>3.0.0</version>
@@ -99,7 +90,7 @@
 			<version>3.0.0</version>
 			<classifier>mule-plugin</classifier>
 			<scope>test</scope>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.mule.weave</groupId>
 			<artifactId>assertions</artifactId>

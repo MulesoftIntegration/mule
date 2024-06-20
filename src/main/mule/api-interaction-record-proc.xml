@@ -11,26 +11,12 @@
                 <http:headers><![CDATA[#[vars.outboundHeaders default {}]]]></http:headers>
             </http:error-response>
         </http:listener>
-        <apikit:router config-ref="api-interaction-record-proc-config" />
+        <logger level="INFO" doc:name="Logger" doc:id="3bec5ceb-3c13-4ce6-80dd-d600037421d2" message='"Request payload is::" #[payload] '/>
+		<apikit:router config-ref="api-interaction-record-proc-config" />
         <error-handler ref="global-exception-strategy">
             
         </error-handler>
     </flow>
-    <!-- [STUDIO:"api-interaction-record-proc-console"]<flow name="api-interaction-record-proc-console">
-        <http:listener path="/console/*" config-ref="api-interaction-record-proc-httpsListenerConfig">
-            <http:response statusCode="#[vars.httpStatus default 200&#93;">
-                <http:headers><![CDATA[#[vars.outboundHeaders default {}&#93;&#93;&#93;></http:headers>
-            </http:response>
-            <http:error-response statusCode="#[vars.httpStatus default 500&#93;">
-                <http:body><![CDATA[#[payload&#93;&#93;&#93;></http:body>
-                <http:headers><![CDATA[#[vars.outboundHeaders default {}&#93;&#93;&#93;></http:headers>
-            </http:error-response>
-        </http:listener>
-        <apikit:console config-ref="api-interaction-record-proc-config" />
-        <error-handler ref="global-exception-strategy">
-            
-        </error-handler>
-    </flow> [STUDIO] -->
     <flow name="post:\interaction\record:api-interaction-record-proc-config">
 		<flow-ref doc:name="resource-start-log-subflow" doc:id="140e51c8-d390-4c19-a74b-32d8f7fe575a" name="resource-start-log-subflow"/>
 		<flow-ref doc:name="interaction-record-creation-Sub_Flow" doc:id="865d1e51-5077-48d6-a4d9-3bbd5d738f34" name="interaction-record-creation-Sub_Flow"/>
