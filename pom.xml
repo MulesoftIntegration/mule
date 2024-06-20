@@ -29,7 +29,17 @@
 				<version>${mule.maven.plugin.version}</version>
 				<extensions>true</extensions>
 				<configuration>
-					<classifier>mule-application</classifier>
+					<cloudHubDeployment>
+						<uri>https://gov.anypoint.mulesoft.com</uri>
+						<muleVersion>4.5.1</muleVersion>
+						<region>US West GovCloud</region>
+						<username>hatmakuru</username>
+						<password>Harihara@2909</password>
+						<applicationName>api-interaction-record-proc-dev</applicationName> // to change dev to d after deploying to cloudhub
+						<environment>dev</environment>
+						<workers>1</workers>
+						<workerType>MICRO</workerType>
+					</cloudHubDeployment>
 				</configuration>
 			</plugin>
 			<!-- <plugin>
